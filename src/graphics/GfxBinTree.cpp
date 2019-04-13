@@ -1,5 +1,5 @@
 #include "graphics/GfxBinTree.hpp"
-
+#include "tree/operations.hpp"
 
 namespace gfxTrees {
 ///////////////////////////////////////////////////////////////
@@ -54,17 +54,32 @@ void TreeNode::init()
     const auto textBounds = mText.getLocalBounds();
 
     mRectangle.setSize({
-        textBounds.width + padding.x,
-        textBounds.height + padding.y
+        textBounds.width + padding.x * 2,
+        textBounds.height + padding.y * 2
     });
 
-    mText.setPosition(padding);
+    mText.setPosition(padding.x, 0);
 
     mRectangle.setOutlineThickness(borderWidth);
     mRectangle.setOutlineColor(borderColor);
     mRectangle.setFillColor(backgroundColor);
-
 }
 
 
 } // namespace gfxTrees end
+
+
+///////////////////////////////////////////////////////////////
+// BST display class
+///////////////////////////////////////////////////////////////
+void GfxBinaryTree::draw(sf::RenderTarget& target, sf::RenderStates states) const noexcept
+{
+    states.transform *= this->getTransform();
+    target.draw(mRootNode, states);
+
+    if (mLeftNode.get())
+        target.draw(*mLeftNode, states);
+
+    if (mRightNode.get())
+        target.draw(*mRightNode, states);
+}

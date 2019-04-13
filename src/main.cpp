@@ -3,6 +3,7 @@
 #include "util/filesystem.h"
 
 #include "tree/BinaryTree.hpp"
+#include "tree/operations.hpp"
 #include "graphics/GfxBinTree.hpp"
 
 
@@ -11,7 +12,7 @@ int main(const int, const char* argv[])
     /**
      * Window
      */
-    sf::RenderWindow window {sf::VideoMode{640, 480}, "SFML_App", sf::Style::Default};
+    sf::RenderWindow window {sf::VideoMode{1024, 768}, "SFML_App", sf::Style::Default};
     sf::View winView {window.getView()};
     window.setVerticalSyncEnabled(true);
 
@@ -37,16 +38,29 @@ int main(const int, const char* argv[])
      */
     gfxTrees::setFont(font);
 
-    BinaryTree<int> bt{200};
-    bt.insert(100);
-    bt.insert(300);
+    BinaryTree<int> bt{1000};
+    bt.insert(500);
+    bt.insert(1500);
+    bt.insert(1200);
+    bt.insert(1400);
+    bt.insert(400);
+    bt.insert(450);
+    bt.insert(800);
+    bt.insert(900);
 
     std::cout << bt.value() << "\n"
         << "left child : " << bt.leftChild().value() << "\n"
         << "right child : " << bt.rightChild().value() << "\n";
 
+    const auto nodesPointers = breadthFirstTraversal(bt);
 
-    GfxMinimalBinTree gt{1,2,3};
+    for (const auto* pointer : nodesPointers)
+        std::cout << pointer->value() << ", ";
+
+    std::cout << "\n";
+
+    GfxBinaryTree gt{bt};
+
 
 
     /**
@@ -100,23 +114,23 @@ int main(const int, const char* argv[])
         const auto frameTime = clock.restart();
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            winView.move(200 * -frameTime.asSeconds(), 0);
+            winView.move(750 * -frameTime.asSeconds(), 0);
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            winView.move(200 * frameTime.asSeconds(), 0);
+            winView.move(750 * frameTime.asSeconds(), 0);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            winView.move(0, 200 * -frameTime.asSeconds());
+            winView.move(0, 750 * -frameTime.asSeconds());
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            winView.move(0, 200 *  frameTime.asSeconds());
+            winView.move(0, 750 *  frameTime.asSeconds());
         }
 
 
         /**
          * Display
          */
-        window.clear({48, 58, 126});
+        window.clear({112, 112, 255});
         window.setView(winView);
 
         window.draw(gt);

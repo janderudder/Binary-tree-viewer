@@ -10,9 +10,27 @@
 int main(const int, const char* argv[])
 {
     /**
+     * Settings
+     */
+    static struct {
+        struct {
+            const float moveSpeed       = 450;
+            const float moveSpeedPlus   = 800;
+        } view;
+    } settings;
+
+
+    static struct {
+        struct {
+            float moveSpeed             = settings.view.moveSpeed;
+        } view;
+    } props;
+
+
+    /**
      * Window
      */
-    sf::RenderWindow window {sf::VideoMode{1024, 768}, "SFML_App", sf::Style::Default};
+    sf::RenderWindow window {sf::VideoMode{1024, 768}, "Tree viewer", sf::Style::Default};
     sf::View winView {window.getView()};
     window.setVerticalSyncEnabled(true);
 
@@ -48,16 +66,17 @@ int main(const int, const char* argv[])
     bt.insert(800);
     bt.insert(900);
 
-    std::cout << bt.value() << "\n"
-        << "left child : " << bt.leftChild().value() << "\n"
-        << "right child : " << bt.rightChild().value() << "\n";
+    std::cout
+        << "root node : "   << bt.value()               << "\n"
+        << "left child : "  << bt.leftChild().value()   << "\n"
+        << "right child : " << bt.rightChild().value()  << "\n";
+
 
     const auto nodesPointers = breadthFirstTraversal(bt);
-
     for (const auto* pointer : nodesPointers)
         std::cout << pointer->value() << ", ";
-
     std::cout << "\n";
+
 
     GfxBinaryTree gt{bt};
 
@@ -77,10 +96,24 @@ int main(const int, const char* argv[])
             {
                 case sf::Event::KeyPressed: {
                     switch (event.key.code) {
+                        case sf::Keyboard::LShift:
+                            props.view.moveSpeed = settings.view.moveSpeedPlus;
+                        break;
+
                         case sf::Keyboard::Enter:
                         case sf::Keyboard::Escape:
                         case sf::Keyboard::Space:
                             window.close();
+                        default:
+                        break;
+                    }
+                }
+                break;
+
+                case sf::Event::KeyReleased: {
+                    switch (event.key.code) {
+                        case sf::Keyboard::LShift:
+                            props.view.moveSpeed = settings.view.moveSpeed;
                         default:
                         break;
                     }
@@ -114,16 +147,24 @@ int main(const int, const char* argv[])
         const auto frameTime = clock.restart();
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            winView.move(750 * -frameTime.asSeconds(), 0);
+            winView.move(props.view.moveSpeed * -frameTime.asSeconds(), 0);
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            winView.move(750 * frameTime.asSeconds(), 0);
+            winView.move(props.view.moveSpeed * frameTime.asSeconds(), 0);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            winView.move(0, 750 * -frameTime.asSeconds());
+            winView.move(0, props.view.moveSpeed * -frameTime.asSeconds());
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            winView.move(0, 750 *  frameTime.asSeconds());
+            winView.move(0, props.view.moveSpeed * frameTime.asSeconds());
+        }
+
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add)) {
+            winView.zoom(.9f);
+        }
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract)) {
+            winView.zoom(1.1f);
         }
 
 
@@ -136,5 +177,7 @@ int main(const int, const char* argv[])
         window.draw(gt);
 
         window.display();
+
     }
+
 }

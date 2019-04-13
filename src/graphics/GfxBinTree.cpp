@@ -1,6 +1,6 @@
 #include "graphics/GfxBinTree.hpp"
 #include "tree/operations.hpp"
-
+#include <iostream>
 namespace gfxTrees {
 ///////////////////////////////////////////////////////////////
 // Global font
@@ -77,9 +77,39 @@ void GfxBinaryTree::draw(sf::RenderTarget& target, sf::RenderStates states) cons
     states.transform *= this->getTransform();
     target.draw(mRootNode, states);
 
-    if (mLeftNode.get())
+    if (mLeftNode.get()) {
         target.draw(*mLeftNode, states);
+    }
 
-    if (mRightNode.get())
+    if (mRightNode.get()) {
         target.draw(*mRightNode, states);
+    }
+    target.draw(mLeftLine, states);
+    target.draw(mRightLine, states);
+}
+
+
+
+void GfxBinaryTree::makeLeftLine(sf::Vector2f root, sf::Vector2f child)
+{
+    mLeftLine[0].position = root;
+    mLeftLine[1].position = child;
+    mLeftLine[0].color = sf::Color::Black;
+    mLeftLine[1].color = sf::Color::Black;
+
+    std::cout << "Left Line : " << mLeftLine[0].position.x << ", " << mLeftLine[0].position.y
+        << " -> " << mLeftLine[1].position.x << ", " << mLeftLine[1].position.y << "\n";
+}
+
+
+
+void GfxBinaryTree::makeRightLine(sf::Vector2f root, sf::Vector2f child)
+{
+    mRightLine[0].position = root;
+    mRightLine[1].position = child;
+    mRightLine[0].color = sf::Color::Black;
+    mRightLine[1].color = sf::Color::Black;
+
+    std::cout << "Right Line : " << mRightLine[0].position.x << ", " << mRightLine[0].position.y
+        << " -> " << mRightLine[1].position.x << ", " << mRightLine[1].position.y << "\n";
 }

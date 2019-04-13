@@ -22,6 +22,14 @@ namespace gfxTrees
         TreeNode(const sf::String&) noexcept;
         TreeNode(sf::String&&) noexcept;
 
+        inline sf::FloatRect getLocalBounds() const {
+            return mRectangle.getLocalBounds();
+        }
+
+        sf::FloatRect getGlobalBounds() const {
+            return this->getTransform().transformRect(this->getLocalBounds());
+        }
+
     private:
         void init();
 
@@ -76,16 +84,21 @@ class GfxBinaryTree
     TreeNode                        mRootNode;
     std::unique_ptr<GfxBinaryTree>  mLeftNode       {nullptr};
     std::unique_ptr<GfxBinaryTree>  mRightNode      {nullptr};
-    sf::VertexArray                 mLines          {sf::PrimitiveType::Lines, 4};
+    sf::VertexArray                 mLeftLine       {sf::PrimitiveType::Lines, 2};
+    sf::VertexArray                 mRightLine      {sf::PrimitiveType::Lines, 2};
 
     virtual void draw(sf::RenderTarget&, sf::RenderStates =sf::RenderStates::Default) const noexcept override;
 
+public:
     template <typename T, class Comp>
     GfxBinaryTree(const BinaryTree<T, Comp>& bt, const sf::Vector2f& rootPosition, std::size_t depthLevel) noexcept;
 
-public:
     template <typename T, class Comp>
     GfxBinaryTree(const BinaryTree<T, Comp>& bt, const sf::Vector2f& rootPosition ={}) noexcept;
+
+private:
+    void makeLeftLine(sf::Vector2f, sf::Vector2f);
+    void makeRightLine(sf::Vector2f, sf::Vector2f);
 
 };
 
@@ -101,14 +114,30 @@ GfxBinaryTree::GfxBinaryTree(const BinaryTree<T, Comp>& bt, const sf::Vector2f& 
 {
     mRootNode.setPosition(rootPosition);
 
-    const sf::Vector2f leftChildPosition = {rootPosition.x - 512, rootPosition.y + 128};
-    const sf::Vector2f rightChildPosition = {rootPosition.x + 512, rootPosition.y + 128};
+    const sf::Vector2f leftChildPosition = {rootPosition.x - 512, rootPosition.y + 256};
+    const sf::Vector2f rightChildPosition = {rootPosition.x + 512, rootPosition.y + 256};
 
-    if (bt.hasLeftChild())
-        mLeftNode = std::make_unique<GfxBinaryTree>(bt.leftChild(), leftChildPosition);
+    if (bt.hasLeftChild()) {
+        mLeftNode = std::make_unique<GfxBinaryTree>(bt.leftChild(), leftChildPosition, 1);
+        this->makeLeftLine(
+        {   rootPosition.x + mRootNode.getGlobalBounds().width / 2.f,
+            rootPosition.y
+        },
+        {   leftChildPosition.x + mLeftNode->mRootNode.getGlobalBounds().width / 2,
+            leftChildPosition.y
+        });
+    }
 
-    if (bt.hasRightChild())
-        mRightNode = std::make_unique<GfxBinaryTree>(bt.rightChild(), rightChildPosition);
+    if (bt.hasRightChild()) {
+        mRightNode = std::make_unique<GfxBinaryTree>(bt.rightChild(), rightChildPosition, 1);
+        this->makeRightLine(
+        {   rootPosition.x + mRootNode.getGlobalBounds().width / 2.f,
+            rootPosition.y
+        },
+        {   rightChildPosition.x + mRightNode->mRootNode.getGlobalBounds().width / 2,
+            rightChildPosition.y
+        });
+    }
 
 }
 
@@ -120,13 +149,29 @@ GfxBinaryTree::GfxBinaryTree(const BinaryTree<T, Comp>& bt, const sf::Vector2f& 
 {
     mRootNode.setPosition(rootPosition);
 
-    const sf::Vector2f leftChildPosition = {rootPosition.x - 512 / depth, rootPosition.y + 128};
-    const sf::Vector2f rightChildPosition = {rootPosition.x + 512 / depth, rootPosition.y + 128};
+    const sf::Vector2f leftChildPosition = {rootPosition.x - 256 + (256 / 4 * depth), rootPosition.y + 256};
+    const sf::Vector2f rightChildPosition = {rootPosition.x + 256 + (256 / 4 * depth), rootPosition.y + 256};
 
-    if (bt.hasLeftChild())
-        mLeftNode = std::make_unique<GfxBinaryTree>(bt.leftChild(), leftChildPosition);
+    if (bt.hasLeftChild()) {
+        mLeftNode = std::make_unique<GfxBinaryTree>(bt.leftChild(), leftChildPosition, depth + 1);
+        this->makeLeftLine(
+        {   rootPosition.x + mRootNode.getGlobalBounds().width / 2.f,
+            rootPosition.y
+        },
+        {   leftChildPosition.x + mLeftNode->mRootNode.getGlobalBounds().width / 2,
+            leftChildPosition.y
+        });
+    }
 
-    if (bt.hasRightChild())
-        mRightNode = std::make_unique<GfxBinaryTree>(bt.rightChild(), rightChildPosition);
+    if (bt.hasRightChild()) {
+        mRightNode = std::make_unique<GfxBinaryTree>(bt.rightChild(), rightChildPosition, depth + 1);
+        this->makeRightLine(
+        {   rootPosition.x + mRootNode.getGlobalBounds().width / 2.f,
+            rootPosition.y
+        },
+        {   rightChildPosition.x + mRightNode->mRootNode.getGlobalBounds().width / 2,
+            rightChildPosition.y
+        });
+    }
 
 }

@@ -27,7 +27,10 @@ struct BinTreeNode
     }
 
     void createTree(ValueType&& value, Compare compare) {
-        tree = std::make_unique<BinaryTree<ValueType, Compare>>(std::forward<ValueType>(value), std::move(compare));
+        tree = std::make_unique<BinaryTree<ValueType, Compare>>(
+            std::forward<ValueType>(value),
+            std::move(compare)
+        );
     }
 
     void insert(ValueType&& value) {

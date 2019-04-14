@@ -44,6 +44,7 @@ private:
 // The main class: graphic reprensentaiton of a binary tree.
 // Construction and drawing are recursive.
 ///////////////////////////////////////////////////////////////
+// template <class ToStringConversion = std::to_string()>
 class BinaryTree
     : public sf::Drawable
     , public sf::Transformable
@@ -56,10 +57,10 @@ class BinaryTree
 
     virtual void draw(sf::RenderTarget&, sf::RenderStates =sf::RenderStates::Default) const noexcept override;
 
-public:
     template <typename T, class Comp>
     BinaryTree(const ::BinaryTree<T, Comp>& bt, const sf::Vector2f& rootPosition, std::size_t depthLevel) noexcept;
 
+public:
     template <typename T, class Comp>
     BinaryTree(const ::BinaryTree<T, Comp>& bt, const sf::Vector2f& rootPosition ={}) noexcept;
 
@@ -78,11 +79,12 @@ BinaryTree::BinaryTree(const ::BinaryTree<T, Comp>& bt, const sf::Vector2f& root
 {
     mRootNode.setPosition(rootPosition);
 
-    const sf::Vector2f leftChildPosition = {rootPosition.x - 512, rootPosition.y + 256};
-    const sf::Vector2f rightChildPosition = {rootPosition.x + 512, rootPosition.y + 256};
+    const sf::Vector2f leftChildPosition = {rootPosition.x - 312, rootPosition.y + 256};
+    const sf::Vector2f rightChildPosition = {rootPosition.x + 312, rootPosition.y + 256};
 
     if (bt.hasLeftChild()) {
-        mLeftNode = std::make_unique<BinaryTree>(bt.leftChild(), leftChildPosition, 1);
+        // Cannot use std::make_unique on private constructor
+        mLeftNode.reset(new BinaryTree{bt.leftChild(), leftChildPosition, 1});
         this->makeLeftLine(
         {   rootPosition.x + mRootNode.getGlobalBounds().width / 2.f,
             rootPosition.y
@@ -93,7 +95,7 @@ BinaryTree::BinaryTree(const ::BinaryTree<T, Comp>& bt, const sf::Vector2f& root
     }
 
     if (bt.hasRightChild()) {
-        mRightNode = std::make_unique<BinaryTree>(bt.rightChild(), rightChildPosition, 1);
+        mRightNode.reset(new BinaryTree{bt.rightChild(), rightChildPosition, 1});
         this->makeRightLine(
         {   rootPosition.x + mRootNode.getGlobalBounds().width / 2.f,
             rootPosition.y
@@ -115,7 +117,7 @@ BinaryTree::BinaryTree(const ::BinaryTree<T, Comp>& bt, const sf::Vector2f& root
     const sf::Vector2f rightChildPosition = {rootPosition.x + 256 + (256 / 4 * depth), rootPosition.y + 256};
 
     if (bt.hasLeftChild()) {
-        mLeftNode = std::make_unique<BinaryTree>(bt.leftChild(), leftChildPosition, depth + 1);
+        mLeftNode.reset(new BinaryTree{bt.leftChild(), leftChildPosition, depth + 1});
         this->makeLeftLine(
         {   rootPosition.x + mRootNode.getGlobalBounds().width / 2.f,
             rootPosition.y
@@ -126,7 +128,7 @@ BinaryTree::BinaryTree(const ::BinaryTree<T, Comp>& bt, const sf::Vector2f& root
     }
 
     if (bt.hasRightChild()) {
-        mRightNode = std::make_unique<BinaryTree>(bt.rightChild(), rightChildPosition, depth + 1);
+        mRightNode.reset(new BinaryTree{bt.rightChild(), rightChildPosition, depth + 1});
         this->makeRightLine(
         {   rootPosition.x + mRootNode.getGlobalBounds().width / 2.f,
             rootPosition.y

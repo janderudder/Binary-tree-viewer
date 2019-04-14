@@ -21,7 +21,7 @@ int main(const int, const char* argv[])
     } settings;
 
 
-    static struct {
+    struct {
         struct {
             float moveSpeed             = settings.view.moveSpeed;
         } view;
@@ -53,26 +53,34 @@ int main(const int, const char* argv[])
 
 
     /**
-     * Program specifics
+     * Binary tree
      */
     gfx::setFont(font);
 
-    BinaryTree<int> bt{1000};
-    bt.insert(500);
-    bt.insert(1500);
-    bt.insert(1200);
-    bt.insert(1400);
-    bt.insert(400);
-    bt.insert(450);
-    bt.insert(800);
-    bt.insert(900);
+    // The tree is constructed with these values
+    BinaryTree<int> bt{20};
+    bt.insert(15);
+    bt.insert(10);
+    bt.insert(8);
+    bt.insert(9);
+    bt.insert(7);
+    bt.insert(12);
+    bt.insert(24);
+    bt.insert(25);
+    bt.insert(16);
+    bt.insert(22);
 
-
+    // Graphic representation of the tree
     gfx::BinaryTree gt{bt};
 
 
+    // View correction
+    winView.setSize({window.getSize().x * 1.5f, window.getSize().y * 1.5f});
+    winView.setCenter(gt.getPosition().x, winView.getCenter().y + 156.f);   // fully handpicked values
+
+
     /**
-     * Loop
+     * Program loop
      */
     while (window.isOpen())
     {

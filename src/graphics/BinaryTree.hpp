@@ -44,7 +44,6 @@ private:
 // The main class: graphic reprensentaiton of a binary tree.
 // Construction and drawing are recursive.
 ///////////////////////////////////////////////////////////////
-// template <class ToStringConversion = std::to_string()>
 class BinaryTree
     : public sf::Drawable
     , public sf::Transformable

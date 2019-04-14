@@ -1,37 +1,47 @@
+///////////////////////////////////////////////////////////////
+//  Binary Tree class, simple implementation.
+///////////////////////////////////////////////////////////////
 #pragma once
 #include <algorithm>
 #include <memory>
 
+///////////////////////////////////////////////////////////////
 // Forward declaration
+///////////////////////////////////////////////////////////////
 template <typename ValueType, class Compare = std::less<ValueType>>
 class BinaryTree;
 
 
-// Helper managing a node of a binary tree
 namespace detail
 {
-    template <typename ValueType, class Compare>
-    struct BinTreeNode
-    {
-        std::unique_ptr<BinaryTree<ValueType, Compare>> tree {nullptr};
+///////////////////////////////////////////////////////////////
+// Helper managing a node of a binary tree
+///////////////////////////////////////////////////////////////
+template <typename ValueType, class Compare>
+struct BinTreeNode
+{
+    std::unique_ptr<BinaryTree<ValueType, Compare>> tree {nullptr};
 
-        bool isTree() const {
-            return tree.get();
-        }
+    bool isTree() const {
+        return tree.get();
+    }
 
-        void createTree(ValueType&& value, Compare compare) {
-            tree = std::make_unique<BinaryTree<ValueType, Compare>>(std::forward<ValueType>(value), std::move(compare));
-        }
+    void createTree(ValueType&& value, Compare compare) {
+        tree = std::make_unique<BinaryTree<ValueType, Compare>>(std::forward<ValueType>(value), std::move(compare));
+    }
 
-        void insert(ValueType&& value) {
-            tree->insert(std::forward<ValueType>(value));
-        }
+    void insert(ValueType&& value) {
+        tree->insert(std::forward<ValueType>(value));
+    }
 
-    };
+};
+
 } // namespace detail end
 
 
+///////////////////////////////////////////////////////////////
 // The binary tree class
+///////////////////////////////////////////////////////////////
 template <typename ValueType, class Compare>
 class BinaryTree
 {

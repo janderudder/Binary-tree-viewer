@@ -2,7 +2,11 @@
 #include <vector>
 #include "tree/BinaryTree.hpp"
 
-
+/**
+ * Breath traversal of a binary tree,
+ * returning an array of pointer to tree nodes,
+ * in traversal order (top left to bottom right).
+ */
 template <template <class ValT, class CompT> class = BinaryTree, class ValT, class CompT =std::less<ValT>>
 std::vector<const BinaryTree<ValT, CompT>*> breadthFirstTraversal(const BinaryTree<ValT, CompT>& bt)
 {

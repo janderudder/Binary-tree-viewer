@@ -4,7 +4,8 @@
 
 #include "tree/BinaryTree.hpp"
 #include "tree/operations.hpp"
-#include "graphics/GfxBinTree.hpp"
+#include "graphics/BinaryTree.hpp"
+#include "graphics/font.hpp"
 
 
 int main(const int, const char* argv[])
@@ -30,7 +31,7 @@ int main(const int, const char* argv[])
     /**
      * Window
      */
-    sf::RenderWindow window {sf::VideoMode{1024, 768}, "Tree viewer", sf::Style::Default};
+    sf::RenderWindow window {sf::VideoMode{1024, 768}, "Binary Tree viewer", sf::Style::Default};
     sf::View winView {window.getView()};
     window.setVerticalSyncEnabled(true);
 
@@ -54,7 +55,7 @@ int main(const int, const char* argv[])
     /**
      * Program specifics
      */
-    gfxTrees::setFont(font);
+    gfx::setFont(font);
 
     BinaryTree<int> bt{1000};
     bt.insert(500);
@@ -66,20 +67,8 @@ int main(const int, const char* argv[])
     bt.insert(800);
     bt.insert(900);
 
-    std::cout
-        << "root node : "   << bt.value()               << "\n"
-        << "left child : "  << bt.leftChild().value()   << "\n"
-        << "right child : " << bt.rightChild().value()  << "\n";
 
-
-    const auto nodesPointers = breadthFirstTraversal(bt);
-    for (const auto* pointer : nodesPointers)
-        std::cout << pointer->value() << ", ";
-    std::cout << "\n";
-
-
-    GfxBinaryTree gt{bt};
-
+    gfx::BinaryTree gt{bt};
 
 
     /**

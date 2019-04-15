@@ -8,20 +8,27 @@
 namespace gfx
 {
 ///////////////////////////////////////////////////////////////
+// Namespace's global font handling functions.
+// Used by TreeNode. Set before instanciating any gfx object!
+///////////////////////////////////////////////////////////////
+void setFont(const sf::Font&);
+const sf::Font& getFont();
+
+
+namespace detail
+///////////////////////////////////////////////////////////////
 // Helper namespace, class for node graphic representation
 ///////////////////////////////////////////////////////////////
-namespace detail
 {
 class TreeNode
-    : public sf::Drawable
-    , public sf::Transformable
+    : public sf::Drawable, public sf::Transformable
 {
     sf::RectangleShape              mRectangle      {};
     sf::Text                        mText;
 
-    virtual void draw(sf::RenderTarget&, sf::RenderStates =sf::RenderStates::Default) const noexcept override;
-
 public:
+    static inline const sf::Font*   mFont           {nullptr};  // encapsulation is kind-of slightly broken here.
+
     TreeNode(const sf::String&) noexcept;
     TreeNode(sf::String&&) noexcept;
 
@@ -34,16 +41,17 @@ public:
     }
 
 private:
+    virtual void draw(sf::RenderTarget&, sf::RenderStates =sf::RenderStates::Default) const noexcept override;
     void init();
 
 };
 
 } // namespace detail end
 
-///////////////////////////////////////////////////////////////
-// The main class: graphic reprensentaiton of a binary tree.
+/////////////////////////////////////////////////////////////////////
+// gfx::BinaryTree class: graphic reprensentation of a binary tree.
 // Construction and drawing are recursive.
-///////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
 class BinaryTree
     : public sf::Drawable
     , public sf::Transformable
@@ -61,7 +69,7 @@ class BinaryTree
 
 public:
     template <typename T, class Comp>
-    BinaryTree(const ::BinaryTree<T, Comp>& bt, const sf::Vector2f& rootPosition ={}) noexcept;
+    BinaryTree(const ::BinaryTree<T, Comp>& bt) noexcept;
 
 private:
     void makeLeftLine(sf::Vector2f, sf::Vector2f);
@@ -69,75 +77,8 @@ private:
 
 };
 
-///////////////////////////////////////////////////////////////
-// Template methods implementation
-///////////////////////////////////////////////////////////////
-template <typename T, class Comp>
-BinaryTree::BinaryTree(const ::BinaryTree<T, Comp>& bt, const sf::Vector2f& rootPosition) noexcept
-    : mRootNode {std::to_string(bt.value())}
-{
-    mRootNode.setPosition(rootPosition);
-
-    const sf::Vector2f leftChildPosition = {rootPosition.x - 312, rootPosition.y + 256};
-    const sf::Vector2f rightChildPosition = {rootPosition.x + 312, rootPosition.y + 256};
-
-    if (bt.hasLeftChild()) {
-        // Cannot use std::make_unique on private constructor
-        mLeftNode.reset(new BinaryTree{bt.leftChild(), leftChildPosition, 1});
-        this->makeLeftLine(
-        {   rootPosition.x + mRootNode.getGlobalBounds().width / 2.f,
-            rootPosition.y
-        },
-        {   leftChildPosition.x + mLeftNode->mRootNode.getGlobalBounds().width / 2,
-            leftChildPosition.y
-        });
-    }
-
-    if (bt.hasRightChild()) {
-        mRightNode.reset(new BinaryTree{bt.rightChild(), rightChildPosition, 1});
-        this->makeRightLine(
-        {   rootPosition.x + mRootNode.getGlobalBounds().width / 2.f,
-            rootPosition.y
-        },
-        {   rightChildPosition.x + mRightNode->mRootNode.getGlobalBounds().width / 2,
-            rightChildPosition.y
-        });
-    }
-
-}
-
-template <typename T, class Comp>
-BinaryTree::BinaryTree(const ::BinaryTree<T, Comp>& bt, const sf::Vector2f& rootPosition, std::size_t depth) noexcept
-    : mRootNode {std::to_string(bt.value())}
-{
-    mRootNode.setPosition(rootPosition);
-
-    const sf::Vector2f leftChildPosition = {rootPosition.x - 256 + (256 / 4 * depth), rootPosition.y + 256};
-    const sf::Vector2f rightChildPosition = {rootPosition.x + 256 + (256 / 4 * depth), rootPosition.y + 256};
-
-    if (bt.hasLeftChild()) {
-        mLeftNode.reset(new BinaryTree{bt.leftChild(), leftChildPosition, depth + 1});
-        this->makeLeftLine(
-        {   rootPosition.x + mRootNode.getGlobalBounds().width / 2.f,
-            rootPosition.y
-        },
-        {   leftChildPosition.x + mLeftNode->mRootNode.getGlobalBounds().width / 2,
-            leftChildPosition.y
-        });
-    }
-
-    if (bt.hasRightChild()) {
-        mRightNode.reset(new BinaryTree{bt.rightChild(), rightChildPosition, depth + 1});
-        this->makeRightLine(
-        {   rootPosition.x + mRootNode.getGlobalBounds().width / 2.f,
-            rootPosition.y
-        },
-        {   rightChildPosition.x + mRightNode->mRootNode.getGlobalBounds().width / 2,
-            rightChildPosition.y
-        });
-    }
-
-}
-
 
 } // namespace gfx end
+
+// Include template methods implementation
+#include "./BinaryTree.tpl.hpp"

@@ -5,7 +5,6 @@
 #include "tree/BinaryTree.hpp"
 #include "tree/operations.hpp"
 #include "graphics/BinaryTree.hpp"
-#include "graphics/font.hpp"
 
 
 int main(const int, const char* argv[])
@@ -55,7 +54,6 @@ int main(const int, const char* argv[])
     /**
      * Binary tree
      */
-    gfx::setFont(font);
 
     // The tree is constructed with these values
     BinaryTree<int> bt{20};
@@ -71,6 +69,7 @@ int main(const int, const char* argv[])
     bt.insert(22);
 
     // Graphic representation of the tree
+    gfx::setFont(font);
     gfx::BinaryTree gt{bt};
 
 

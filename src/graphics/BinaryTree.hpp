@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include "tree/BinaryTree.hpp"
+#include "util/ToString.hpp"
 
 namespace gfx
 {
@@ -52,10 +53,12 @@ private:
 // gfx::BinaryTree class: graphic reprensentation of a binary tree.
 // Construction and drawing are recursive.
 /////////////////////////////////////////////////////////////////////
+template <class Stringify =util::ToString>
 class BinaryTree
     : public sf::Drawable
     , public sf::Transformable
 {
+    Stringify                       mStringify;
     detail::TreeNode                mRootNode;
     std::unique_ptr<BinaryTree>     mLeftNode       {nullptr};
     std::unique_ptr<BinaryTree>     mRightNode      {nullptr};
@@ -65,11 +68,11 @@ class BinaryTree
     virtual void draw(sf::RenderTarget&, sf::RenderStates =sf::RenderStates::Default) const noexcept override;
 
     template <typename T, class Comp>
-    BinaryTree(const ::BinaryTree<T, Comp>& bt, const sf::Vector2f& rootPosition, std::size_t depthLevel) noexcept;
+    BinaryTree(const ::BinaryTree<T, Comp>& bt, Stringify, const sf::Vector2f& rootPosition, std::size_t depthLevel) noexcept;
 
 public:
     template <typename T, class Comp>
-    BinaryTree(const ::BinaryTree<T, Comp>& bt) noexcept;
+    BinaryTree(const ::BinaryTree<T, Comp>& bt, Stringify =Stringify()) noexcept;
 
 private:
     void makeLeftLine(sf::Vector2f, sf::Vector2f);

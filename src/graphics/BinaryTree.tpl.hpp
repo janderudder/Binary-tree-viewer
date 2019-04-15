@@ -4,16 +4,18 @@ namespace gfx
 ///////////////////////////////////////////////////////////////
 // Binary Tree graphic, template implementation.
 ///////////////////////////////////////////////////////////////
+template <class Stringify>
 template <typename T, class Comp>
-BinaryTree::BinaryTree(const ::BinaryTree<T, Comp>& bt) noexcept
-    : mRootNode     {std::to_string(bt.value())}
+BinaryTree<Stringify>::BinaryTree(const ::BinaryTree<T, Comp>& bt, Stringify strfy) noexcept
+    : mStringify    {std::move(strfy)}
+    , mRootNode     {mStringify(bt.value())}
 {
     const sf::Vector2f leftChildPosition = { -312, 256 };
     const sf::Vector2f rightChildPosition = { +312, 256};
 
     if (bt.hasLeftChild()) {
         // Cannot use std::make_unique on private constructor
-        mLeftNode.reset(new BinaryTree{bt.leftChild(), leftChildPosition, 1});
+        mLeftNode.reset(new BinaryTree{bt.leftChild(), mStringify, leftChildPosition, 1});
         this->makeLeftLine(
         {   mRootNode.getGlobalBounds().width / 2.f, 0.f
         },
@@ -23,7 +25,7 @@ BinaryTree::BinaryTree(const ::BinaryTree<T, Comp>& bt) noexcept
     }
 
     if (bt.hasRightChild()) {
-        mRightNode.reset(new BinaryTree{bt.rightChild(), rightChildPosition, 1});
+        mRightNode.reset(new BinaryTree{bt.rightChild(), mStringify, rightChildPosition, 1});
         this->makeRightLine(
         {   mRootNode.getGlobalBounds().width / 2.f, 0.f
         },
@@ -35,9 +37,11 @@ BinaryTree::BinaryTree(const ::BinaryTree<T, Comp>& bt) noexcept
 }
 
 
+template <class Stringify>
 template <typename T, class Comp>
-BinaryTree::BinaryTree(const ::BinaryTree<T, Comp>& bt, const sf::Vector2f& rootPosition, std::size_t depth) noexcept
-    : mRootNode {std::to_string(bt.value())}
+BinaryTree<Stringify>::BinaryTree(const ::BinaryTree<T, Comp>& bt, Stringify strfy, const sf::Vector2f& rootPosition, std::size_t depth) noexcept
+    : mStringify    {std::move(strfy)}
+    , mRootNode     {mStringify(bt.value())}
 {
     mRootNode.setPosition(rootPosition);
 
@@ -45,7 +49,7 @@ BinaryTree::BinaryTree(const ::BinaryTree<T, Comp>& bt, const sf::Vector2f& root
     const sf::Vector2f rightChildPosition = {rootPosition.x + 256 + (256 / 4 * depth), rootPosition.y + 256};
 
     if (bt.hasLeftChild()) {
-        mLeftNode.reset(new BinaryTree{bt.leftChild(), leftChildPosition, depth + 1});
+        mLeftNode.reset(new BinaryTree{bt.leftChild(), mStringify, leftChildPosition, depth + 1});
         this->makeLeftLine(
         {   rootPosition.x + mRootNode.getGlobalBounds().width / 2.f,
             rootPosition.y
@@ -56,7 +60,7 @@ BinaryTree::BinaryTree(const ::BinaryTree<T, Comp>& bt, const sf::Vector2f& root
     }
 
     if (bt.hasRightChild()) {
-        mRightNode.reset(new BinaryTree{bt.rightChild(), rightChildPosition, depth + 1});
+        mRightNode.reset(new BinaryTree{bt.rightChild(), mStringify, rightChildPosition, depth + 1});
         this->makeRightLine(
         {   rootPosition.x + mRootNode.getGlobalBounds().width / 2.f,
             rootPosition.y
@@ -69,7 +73,8 @@ BinaryTree::BinaryTree(const ::BinaryTree<T, Comp>& bt, const sf::Vector2f& root
 }
 
 
-inline void BinaryTree::draw(sf::RenderTarget& target, sf::RenderStates states) const noexcept
+template <class Stringify>
+void BinaryTree<Stringify>::draw(sf::RenderTarget& target, sf::RenderStates states) const noexcept
 {
     states.transform *= this->getTransform();
     target.draw(mRootNode, states);
@@ -86,7 +91,8 @@ inline void BinaryTree::draw(sf::RenderTarget& target, sf::RenderStates states) 
 }
 
 
-inline void BinaryTree::makeLeftLine(sf::Vector2f root, sf::Vector2f child)
+template <class Stringify>
+void BinaryTree<Stringify>::makeLeftLine(sf::Vector2f root, sf::Vector2f child)
 {
     mLeftLine[0].position = root;
     mLeftLine[1].position = child;
@@ -95,7 +101,8 @@ inline void BinaryTree::makeLeftLine(sf::Vector2f root, sf::Vector2f child)
 }
 
 
-inline void BinaryTree::makeRightLine(sf::Vector2f root, sf::Vector2f child)
+template <class Stringify>
+void BinaryTree<Stringify>::makeRightLine(sf::Vector2f root, sf::Vector2f child)
 {
     mRightLine[0].position = root;
     mRightLine[1].position = child;
